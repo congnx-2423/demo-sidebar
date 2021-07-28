@@ -11,6 +11,7 @@
             class="item"
             :item="item"
             :key="index"
+
           ></sub-directory>
         </ul>
       </div>
@@ -33,23 +34,6 @@ export default defineComponent({
     return {
       treeData: [
         {
-          name: "Folder A",
-          children: [
-            { name: "A. 1", marked: false },
-            { name: "A. 2", marked: false },
-            {
-              name: "A. 3",
-              children: [
-                { name: "A. 3.1", marked: false },
-                { name: "A. 3.2", marked: false },
-                { name: "A. 3.3", marked: false },
-              ],
-              marked: false
-            }
-          ],
-          marked: false
-        },
-        {
           name: "Folder B",
           children: [
             { name: "B. 1", marked: false },
@@ -66,9 +50,35 @@ export default defineComponent({
           ],
           marked: false
         },
+        {
+          name: "Folder A",
+          children: [
+            { name: "A. 1", marked: false },
+            { name: "A. 2", marked: false },
+            {
+              name: "A. 3",
+              children: [
+                { name: "A. 3.1", marked: false },
+                { name: "A. 3.2", marked: false },
+                { name: "A. 3.3", marked: false },
+              ],
+              marked: false
+            }
+          ],
+          marked: true
+        },
       ]
     }
   },
+  computed: {
+    // eslint-disable-next-line vue/no-dupe-keys
+    treeData: function () {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      return this.treeData.sort((item1, item2) => {
+          return item2.marked - item1.marked;
+      });
+    }
+  }
 });
 </script>
 

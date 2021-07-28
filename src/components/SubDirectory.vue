@@ -3,14 +3,18 @@
     <div class="main-folder"
       :class="{bold: isFolder}"
     >
-      <span v-if="isFolder">
-        <i class="fas fa-angle-down" style="font-size:20px" v-if="isOpen"></i>
-        <i class="fas fa-angle-right" style="font-size:20px" v-else></i>
-      </span>
-      <i class="fa fa-folder folder" :class="{active: isOpen}"></i>
-      <span style="margin-left: 15px" @click="toggle">{{ item.name }}</span>
-      <span v-if="item.children" class="number" :class="{active: isOpen}">{{item.children.length}}</span>
-      <i class="fa-star marked" :class="[item.marked ? 'fas' : 'far']"></i>
+      <div class="left">
+        <span v-if="isFolder">
+          <i class="fas fa-angle-down" style="font-size:20px" v-if="isOpen"></i>
+          <i class="fas fa-angle-right" style="font-size:20px" v-else></i>
+        </span>
+        <i class="fa fa-folder folder" :class="{active: isOpen}"></i>
+        <span style="margin-left: 15px" @click="toggle">{{ item.name }}</span>
+      </div>
+      <div class="right">
+        <p v-if="item.children" v-show="isOpen" class="number" :class="{active: isOpen}">{{item.children.length}}</p>
+        <i class="fa-star marked" :class="[item.marked ? 'fas' : 'far']" @click="markDir"></i>
+      </div>
     </div>
     <ul v-show="isOpen" v-if="isFolder">
       <sub-directory
@@ -47,9 +51,14 @@ export default defineComponent({
         isOpen.value = !isOpen.value;
       }
     };
+    const markDir = () => {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.item.marked = !props.item.marked
+    }
 
     return {
       toggle,
+      markDir,
       isFolder,
       isOpen
     };
@@ -62,6 +71,26 @@ export default defineComponent({
   background-color: gainsboro;
   line-height: 50px;
   padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.main-folder .left, .right {
+  display: flex;
+  align-items: center;
+}
+
+.main-folder .right p{
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  display: block;
+  line-height: 20px;
+  color: white;
+  background: orange;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 11px;
 }
 
 ul {
@@ -72,11 +101,8 @@ ul {
   color: orange;
 }
 
-.number {
-  margin-left: 90px;
-}
 .marked {
-  margin-left: 10px;
+  margin-left: 5px;
 }
 
 .fa-star.fas {
