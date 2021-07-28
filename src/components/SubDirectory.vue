@@ -31,7 +31,7 @@ export default defineComponent({
   name: 'SubDirectory',
   props: {
     item: {
-      type: Item,
+      type: Object as () => Item,
       required: true,
     },
     key: Number,
