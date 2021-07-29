@@ -6,12 +6,12 @@
     <div class="row body">
       <div class="col-3 sidebar">
         SIDE BAR
-        <ul id="demo" v-for="(item, index) in treeData" :key="index" :item="item">
+        <ul id="demo" v-for="(item, index) in treeDataSorted" :key="index" :item="item">
           <sub-directory
             class="item"
             :item="item"
             :key="index"
-
+            @markDir="markDir"
           ></sub-directory>
         </ul>
       </div>
@@ -22,9 +22,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {defineComponent} from "vue";
-import SubDirectory from './SubDirectory';
+import SubDirectory from './SubDirectory.vue';
+import Item from "@/interface/Item";
+
 export default defineComponent({
   name: 'MainDirectory',
   components: {
@@ -34,16 +36,18 @@ export default defineComponent({
     return {
       treeData: [
         {
+          id: 1,
           name: "Folder B",
           children: [
-            { name: "B. 1", marked: false },
-            { name: "B. 2", marked: false },
+            { id: 2, name: "B. 1", marked: false },
+            { id: 3, name: "B. 2", marked: false },
             {
+              id: 4,
               name: "B. 3",
               children: [
-                { name: "B. 3.1", marked: false },
-                { name: "B. 3.2", marked: false },
-                { name: "B. 3.3", marked: false },
+                { id: 5, name: "B. 3.1", marked: false },
+                { id: 6, name: "B. 3.2", marked: false },
+                { id: 7, name: "B. 3.3", marked: false },
               ],
               marked: false
             }
@@ -51,16 +55,18 @@ export default defineComponent({
           marked: false
         },
         {
+          id: 8,
           name: "Folder A",
           children: [
-            { name: "A. 1", marked: false },
-            { name: "A. 2", marked: false },
+            { id: 9, name: "A. 1", marked: false },
+            { id: 10, name: "A. 2", marked: false },
             {
+              id: 11,
               name: "A. 3",
               children: [
-                { name: "A. 3.1", marked: false },
-                { name: "A. 3.2", marked: false },
-                { name: "A. 3.3", marked: false },
+                { id: 12, name: "A. 3.1", marked: false },
+                { id: 13, name: "A. 3.2", marked: false },
+                { id: 14, name: "A. 3.3", marked: false },
               ],
               marked: false
             }
@@ -71,12 +77,39 @@ export default defineComponent({
     }
   },
   computed: {
-    // eslint-disable-next-line vue/no-dupe-keys
-    treeData: function () {
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      return this.treeData.sort((item1, item2) => {
-          return item2.marked - item1.marked;
+    treeDataSorted(): Array<Item> {
+      return this.sortTree(this.treeData);
+    }
+  },
+  methods: {
+    sortTree(tree: Array<Item>): Array<Item> {
+      tree.forEach(item => {
+        if (item.children && item.children.length)
+          item.children = this.sortTree(item.children);
       });
+      return tree.sort((item1: Item, item2: Item) => {
+        if(item1.marked === item2.marked)
+          if(item1.name <= item2.name)
+            return -1;
+          else return 1;
+        else
+          if(item1.marked && !item2.marked)
+            return -1;
+          else return 1;
+      });
+    },
+    iterator(tree: Array<Item>, id: number): void {
+      tree.forEach(item => {
+        if(item.id === id){
+          item.marked = !item.marked;
+          return;
+        }
+        if(item.children)
+          this.iterator(item.children, id);
+      })
+    },
+    markDir(itemId: number): void {
+      this.iterator(this.treeData, itemId);
     }
   }
 });
@@ -118,5 +151,6 @@ body {
 
 ul {
   list-style-type: none;
+  margin-top: 1rem;
 }
 </style>
