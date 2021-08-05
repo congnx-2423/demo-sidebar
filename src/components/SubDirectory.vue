@@ -1,19 +1,17 @@
 <template>
   <li>
-    <div class="main-folder"
-      :class="{bold: isFolder}"
-    >
+    <div class="main-folder" :class="{bold: isFolder}">
       <div class="left">
         <span v-if="isFolder">
           <i class="fas fa-angle-down" style="font-size:20px" v-if="isOpen"></i>
           <i class="fas fa-angle-right" style="font-size:20px" v-else></i>
         </span>
         <i class="fa fa-folder folder" :class="{active: isOpen}"></i>
-        <span style="margin-left: 15px" @click="toggle">{{ item.name }}</span>
+        <span class="item-name" @click="toggle">{{ item.name }}</span>
       </div>
       <div class="right">
         <p v-if="item.children" v-show="isOpen" class="number" :class="{active: isOpen}">{{item.children.length}}</p>
-        <i class="fa-star marked" :class="[item.marked ? 'fas' : 'far']" @click="markDir"></i>
+        <i class="fa-star marked" :class="[item.marked ? 'fas' : 'far']" @click="markDir(item.id)"></i>
       </div>
     </div>
     <ul v-show="isOpen" v-if="isFolder">
@@ -22,6 +20,7 @@
         v-for="(child, index) in item.children"
         :key="index"
         :item="child"
+        @markDir="markDir"
       ></sub-directory>
     </ul>
   </li>
@@ -51,18 +50,18 @@ export default defineComponent({
         isOpen.value = !isOpen.value;
       }
     };
-    const markDir = () => {
-      // eslint-disable-next-line vue/no-mutating-props
-      props.item.marked = !props.item.marked
-    }
 
     return {
       toggle,
-      markDir,
       isFolder,
       isOpen
     };
   },
+  methods: {
+    markDir: function(itemId: Number) {
+      this.$emit('markDir', itemId);
+    },
+  }
 })
 </script>
 
@@ -95,6 +94,10 @@ export default defineComponent({
 
 ul {
   list-style-type: none;
+}
+
+.item-name {
+  padding: 0 20px 0 15px;
 }
 
 .active {
